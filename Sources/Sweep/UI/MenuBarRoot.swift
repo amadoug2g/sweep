@@ -126,7 +126,7 @@ struct MenuBarRoot: View {
                 }
                 .font(.caption)
                 .buttonStyle(.borderless)
-                .foregroundStyle(.accentColor)
+                .foregroundStyle(Color.accentColor)
             }
         }
         .padding(.horizontal, 12)

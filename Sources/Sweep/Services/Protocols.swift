@@ -34,6 +34,7 @@ public protocol ActionExecuting: Sendable {
 
 public protocol UndoLogging: Sendable {
     func record(_ record: UndoRecord) throws
+    @discardableResult
     func undo(id: UUID) throws -> UndoRecord
     func undoLastBatch(batchId: UUID) throws -> [UndoRecord]
     func recentRecords(limit: Int) -> [UndoRecord]

@@ -29,7 +29,7 @@ public final class AppContainer: ObservableObject {
     /// Shared production instance. The nonisolated(unsafe) annotation is intentional:
     /// the closure runs before the main run loop starts (from SweepMain.main()), and
     /// all captured service types are Sendable, so there is no data race.
-    public nonisolated(unsafe) static let live: AppContainer = {
+    public nonisolated(unsafe) static let live: AppContainer = MainActor.assumeIsolated {
         let keychain = KeychainStore()
         let undoLog = UndoLog()
         return AppContainer(
@@ -42,7 +42,7 @@ public final class AppContainer: ObservableObject {
             notifier: NotificationService(),
             trust: TrustPhaseService()
         )
-    }()
+    }
 
     // MARK: - Init (testable)
 
