@@ -1,5 +1,7 @@
-import Foundation
-import os.log
+@preconcurrency import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 // MARK: - URLSession protocol for testability
 
@@ -7,7 +9,9 @@ public protocol URLSessionProtocol: Sendable {
     func data(for request: URLRequest) async throws -> (Data, URLResponse)
 }
 
+#if canImport(Darwin)
 extension URLSession: URLSessionProtocol {}
+#endif
 
 // MARK: - Errors
 
@@ -237,11 +241,13 @@ public final class ClaudeClient: ClaudeClienting {
     // MARK: - Init
 
     /// Production initialiser using `URLSession.shared` and real exponential backoff sleep.
+    #if canImport(Darwin)
     public convenience init(keychainStore: KeychainStoring, session: URLSession = .shared) {
         self.init(keychainStore: keychainStore, urlSession: session, sleepNanoseconds: { ns in
             try await Task.sleep(nanoseconds: ns)
         })
     }
+    #endif
 
     /// Designated initialiser — allows injection of a custom `URLSessionProtocol` and sleep
     /// function (useful in tests).
@@ -271,7 +277,7 @@ public final class ClaudeClient: ClaudeClienting {
             let data = try SweepJSON.encoder.encode(context)
             contextJSON = String(data: data, encoding: .utf8) ?? "{}"
         } catch {
-            SweepLogger.claude.error("ClaudeClient.propose: failed to encode ContextProfile: \(error.localizedDescription, privacy: .public)")
+            SweepLogger.claude.error("ClaudeClient.propose: failed to encode ContextProfile: \(error.localizedDescription)")
             throw ClaudeClientError.invalidResponse("Failed to encode context: \(error.localizedDescription)")
         }
 
@@ -413,7 +419,7 @@ public final class ClaudeClient: ClaudeClienting {
 
                 guard (200..<300).contains(httpResponse.statusCode) else {
                     let body = String(data: data, encoding: .utf8) ?? "<binary>"
-                    SweepLogger.claude.error("ClaudeClient: HTTP \(httpResponse.statusCode): \(body, privacy: .public)")
+                    SweepLogger.claude.error("ClaudeClient: HTTP \(httpResponse.statusCode): \(body)")
                     throw ClaudeClientError.httpError(statusCode: httpResponse.statusCode, body: body)
                 }
 
@@ -441,7 +447,7 @@ public final class ClaudeClient: ClaudeClienting {
             claudeResponse = try JSONDecoder().decode(ClaudeResponse.self, from: responseData)
         } catch {
             let raw = String(data: responseData, encoding: .utf8) ?? "<binary>"
-            SweepLogger.claude.error("ClaudeClient: failed to decode response: \(error.localizedDescription, privacy: .public), body: \(raw, privacy: .private)")
+            SweepLogger.claude.error("ClaudeClient: failed to decode response: \(error.localizedDescription), body: \(raw)")
             throw ClaudeClientError.invalidResponse("JSON decode failed: \(error.localizedDescription)")
         }
 
@@ -461,19 +467,19 @@ public final class ClaudeClient: ClaudeClienting {
         for responseItem in input.items {
             // Map confidence string to ConfidenceTier
             guard let confidenceTier = ConfidenceTier(rawValue: responseItem.confidence) else {
-                SweepLogger.claude.warning("ClaudeClient: unknown confidence '\(responseItem.confidence, privacy: .public)' for \(responseItem.fileUrl, privacy: .private) — skipping")
+                SweepLogger.claude.warning("ClaudeClient: unknown confidence '\(responseItem.confidence)' for \(responseItem.fileUrl) — skipping")
                 continue
             }
 
             // Skip low-confidence items
             if confidenceTier == .low {
-                SweepLogger.claude.debug("ClaudeClient: skipping low-confidence item \(responseItem.fileUrl, privacy: .private)")
+                SweepLogger.claude.debug("ClaudeClient: skipping low-confidence item \(responseItem.fileUrl)")
                 continue
             }
 
             // Match back to input FileItem
             guard let fileItem = fileByPath[responseItem.fileUrl] else {
-                SweepLogger.claude.warning("ClaudeClient: response item '\(responseItem.fileUrl, privacy: .private)' not found in input files — skipping")
+                SweepLogger.claude.warning("ClaudeClient: response item '\(responseItem.fileUrl)' not found in input files — skipping")
                 continue
             }
 
@@ -482,7 +488,7 @@ public final class ClaudeClient: ClaudeClienting {
             switch responseItem.action.type {
             case "move":
                 guard let destinationPath = responseItem.action.destination, !destinationPath.isEmpty else {
-                    SweepLogger.claude.warning("ClaudeClient: move action missing destination for \(responseItem.fileUrl, privacy: .private) — falling back to reviewLater")
+                    SweepLogger.claude.warning("ClaudeClient: move action missing destination for \(responseItem.fileUrl) — falling back to reviewLater")
                     proposedAction = .reviewLater(reason: responseItem.reason)
                     break
                 }
@@ -494,7 +500,7 @@ public final class ClaudeClient: ClaudeClienting {
             case "keep":
                 proposedAction = .keep(reason: responseItem.reason)
             default:
-                SweepLogger.claude.warning("ClaudeClient: unknown action type '\(responseItem.action.type, privacy: .public)' for \(responseItem.fileUrl, privacy: .private) — skipping")
+                SweepLogger.claude.warning("ClaudeClient: unknown action type '\(responseItem.action.type)' for \(responseItem.fileUrl) — skipping")
                 continue
             }
 

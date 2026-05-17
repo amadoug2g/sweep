@@ -1,4 +1,4 @@
-import Foundation
+@preconcurrency import Foundation
 
 public enum ProposedAction: Equatable, Sendable {
     case move(destination: URL, reason: String)

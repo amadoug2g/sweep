@@ -1,4 +1,4 @@
-import Foundation
+@preconcurrency import Foundation
 
 public struct UndoRecord: Codable, Identifiable, Sendable {
     public let id: UUID

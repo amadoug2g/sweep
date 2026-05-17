@@ -1,3 +1,4 @@
+#if canImport(SwiftUI)
 import SwiftUI
 import os.log
 
@@ -160,3 +161,4 @@ public final class AppContainer: ObservableObject {
         keychain.save(key: "anthropic_api_key", value: key)
     }
 }
+#endif

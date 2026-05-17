@@ -1,4 +1,4 @@
-import Foundation
+@preconcurrency import Foundation
 
 public struct FileItem: Codable, Hashable, Sendable {
     public let url: URL

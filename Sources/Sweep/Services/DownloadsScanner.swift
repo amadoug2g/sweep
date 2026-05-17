@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
+#endif
 
 public final class DownloadsScanner: DownloadsScanning, @unchecked Sendable {
 
@@ -20,13 +22,15 @@ public final class DownloadsScanner: DownloadsScanning, @unchecked Sendable {
     }
 
     public func scan() async throws -> ScanReport {
-        let resourceKeys: [URLResourceKey] = [
+        var resourceKeys: [URLResourceKey] = [
             .fileSizeKey,
             .creationDateKey,
             .contentModificationDateKey,
-            .typeIdentifierKey,
             .isDirectoryKey
         ]
+        #if canImport(UniformTypeIdentifiers)
+        resourceKeys.append(.typeIdentifierKey)
+        #endif
 
         let contents = try FileManager.default.contentsOfDirectory(
             at: downloadsURL,
@@ -72,13 +76,14 @@ public final class DownloadsScanner: DownloadsScanning, @unchecked Sendable {
             let size = Int64(resourceValues.fileSize ?? 0)
             let createdAt = resourceValues.creationDate ?? modifiedAt
 
-            // Derive MIME type from UTI (UTType API is available on macOS 11+; this
-            // package targets macOS 13 so the guard is satisfied at compile time).
+            // Derive MIME type from UTI (macOS only; on Linux mimeType stays nil).
             var mimeType: String?
+            #if canImport(UniformTypeIdentifiers)
             if let typeIdentifier = resourceValues.typeIdentifier,
                let utType = UTType(typeIdentifier) {
                 mimeType = utType.preferredMIMEType
             }
+            #endif
 
             let item = FileItem(
                 url: url,

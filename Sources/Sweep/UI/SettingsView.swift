@@ -1,3 +1,4 @@
+#if canImport(AppKit)
 import SwiftUI
 import AppKit
 
@@ -91,3 +92,4 @@ struct SettingsView: View {
         isTestingKey = false
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if canImport(AppKit)
 import SwiftUI
 import AppKit
 
@@ -197,3 +198,4 @@ struct MenuBarRoot: View {
         }
     }
 }
+#endif

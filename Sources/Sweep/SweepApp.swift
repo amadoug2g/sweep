@@ -1,3 +1,4 @@
+#if canImport(SwiftUI)
 import SwiftUI
 
 public struct SweepApp: App {
@@ -20,3 +21,4 @@ public struct SweepApp: App {
 
     private var isScanning: Bool { container.isScanning }
 }
+#endif

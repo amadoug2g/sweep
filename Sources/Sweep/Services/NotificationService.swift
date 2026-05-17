@@ -1,3 +1,4 @@
+#if canImport(UserNotifications)
 import Foundation
 import UserNotifications
 
@@ -69,3 +70,4 @@ public final class NotificationService: Notifying, @unchecked Sendable {
         UNUserNotificationCenter.current().setNotificationCategories([category])
     }
 }
+#endif

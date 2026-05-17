@@ -6,8 +6,8 @@ final class FileItemTests: XCTestCase {
     private func makeItem(
         url: URL = URL(fileURLWithPath: "/Users/test/Downloads/MyDocument.PDF"),
         size: Int64 = 1024,
-        createdAt: Date = Date(timeIntervalSinceNow: -86400),
-        modifiedAt: Date = Date(timeIntervalSinceNow: -3600),
+        createdAt: Date = Date(timeIntervalSince1970: 1_716_000_000),
+        modifiedAt: Date = Date(timeIntervalSince1970: 1_716_086_400),
         mimeType: String? = "application/pdf",
         sha256Prefix: String? = "abc123"
     ) -> FileItem {

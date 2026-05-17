@@ -1,3 +1,4 @@
+#if canImport(Security)
 import Foundation
 import Security
 
@@ -100,3 +101,4 @@ public final class KeychainStore: KeychainStoring {
         ]
     }
 }
+#endif

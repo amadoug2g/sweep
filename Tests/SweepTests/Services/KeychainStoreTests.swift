@@ -1,3 +1,4 @@
+#if canImport(Security)
 import XCTest
 @testable import Sweep
 
@@ -85,3 +86,4 @@ final class KeychainStoreTests: XCTestCase {
         XCTAssertTrue(result)
     }
 }
+#endif

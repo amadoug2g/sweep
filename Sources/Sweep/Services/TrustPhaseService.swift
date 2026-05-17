@@ -1,4 +1,4 @@
-import Foundation
+@preconcurrency import Foundation
 
 public final class TrustPhaseService: TrustPhasing {
 
@@ -34,7 +34,7 @@ public final class TrustPhaseService: TrustPhasing {
         }
         let elapsed = Date().timeIntervalSince(installDate)
         let result = elapsed < trustPeriodDays * 86_400
-        SweepLogger.trust.debug("TrustPhaseService.isInTrustPeriod: elapsed=\(elapsed, privacy: .public) result=\(result, privacy: .public)")
+        SweepLogger.trust.debug("TrustPhaseService.isInTrustPeriod: elapsed=\(elapsed) result=\(result)")
         return result
     }
 
@@ -66,6 +66,6 @@ public final class TrustPhaseService: TrustPhasing {
         guard defaults.object(forKey: Keys.installDate) == nil else { return }
         let now = Date()
         defaults.set(now, forKey: Keys.installDate)
-        SweepLogger.trust.info("TrustPhaseService: recorded install date \(now, privacy: .public)")
+        SweepLogger.trust.info("TrustPhaseService: recorded install date \(now)")
     }
 }

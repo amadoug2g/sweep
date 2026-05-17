@@ -1,4 +1,4 @@
-import Foundation
+@preconcurrency import Foundation
 
 public final class ContextStore: ContextStoring {
 
@@ -35,7 +35,7 @@ public final class ContextStore: ContextStoring {
             SweepLogger.storage.debug("ContextStore.load: loaded profile version=\(profile.version)")
             return profile
         } catch {
-            SweepLogger.storage.error("ContextStore.load: decode failed — \(error.localizedDescription, privacy: .public)")
+            SweepLogger.storage.error("ContextStore.load: decode failed — \(error.localizedDescription)")
             throw error
         }
     }
@@ -47,7 +47,7 @@ public final class ContextStore: ContextStoring {
         do {
             data = try SweepJSON.encoder.encode(profile)
         } catch {
-            SweepLogger.storage.error("ContextStore.save: encode failed — \(error.localizedDescription, privacy: .public)")
+            SweepLogger.storage.error("ContextStore.save: encode failed — \(error.localizedDescription)")
             throw error
         }
 
@@ -57,12 +57,22 @@ public final class ContextStore: ContextStoring {
 
         do {
             try data.write(to: tmpURL, options: .atomic)
+            // replaceItemAt atomically replaces on Apple platforms; fall back to
+            // remove-then-move on Linux where replaceItemAt may not support a
+            // missing destination.
+            #if canImport(Darwin)
             _ = try FileManager.default.replaceItemAt(fileURL, withItemAt: tmpURL)
+            #else
+            if FileManager.default.fileExists(atPath: fileURL.path) {
+                try FileManager.default.removeItem(at: fileURL)
+            }
+            try FileManager.default.moveItem(at: tmpURL, to: fileURL)
+            #endif
             SweepLogger.storage.debug("ContextStore.save: wrote profile version=\(profile.version)")
         } catch {
             // Clean up tmp if it lingers.
             try? FileManager.default.removeItem(at: tmpURL)
-            SweepLogger.storage.error("ContextStore.save: write failed — \(error.localizedDescription, privacy: .public)")
+            SweepLogger.storage.error("ContextStore.save: write failed — \(error.localizedDescription)")
             throw error
         }
     }
@@ -74,9 +84,9 @@ public final class ContextStore: ContextStoring {
         guard !FileManager.default.fileExists(atPath: dir.path) else { return }
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            SweepLogger.storage.info("ContextStore: created directory at \(dir.path, privacy: .public)")
+            SweepLogger.storage.info("ContextStore: created directory at \(dir.path)")
         } catch {
-            SweepLogger.storage.error("ContextStore: failed to create directory — \(error.localizedDescription, privacy: .public)")
+            SweepLogger.storage.error("ContextStore: failed to create directory — \(error.localizedDescription)")
             throw error
         }
     }

@@ -1,5 +1,8 @@
 import XCTest
 @testable import Sweep
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 // MARK: - MockURLSession
 
