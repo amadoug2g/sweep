@@ -1,7 +1,7 @@
 import Foundation
 import UniformTypeIdentifiers
 
-public final class DownloadsScanner: DownloadsScanning {
+public final class DownloadsScanner: DownloadsScanning, @unchecked Sendable {
 
     private let downloadsURL: URL
     private let minimumAgeSeconds: TimeInterval
@@ -72,14 +72,12 @@ public final class DownloadsScanner: DownloadsScanning {
             let size = Int64(resourceValues.fileSize ?? 0)
             let createdAt = resourceValues.creationDate ?? modifiedAt
 
-            // Derive MIME type from UTI.
+            // Derive MIME type from UTI (UTType API is available on macOS 11+; this
+            // package targets macOS 13 so the guard is satisfied at compile time).
             var mimeType: String?
-            if let typeIdentifier = resourceValues.typeIdentifier {
-                if #available(macOS 11.0, *) {
-                    if let utType = UTType(typeIdentifier) {
-                        mimeType = utType.preferredMIMEType
-                    }
-                }
+            if let typeIdentifier = resourceValues.typeIdentifier,
+               let utType = UTType(typeIdentifier) {
+                mimeType = utType.preferredMIMEType
             }
 
             let item = FileItem(

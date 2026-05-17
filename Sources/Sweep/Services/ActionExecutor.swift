@@ -1,6 +1,6 @@
 import Foundation
 
-public final class ActionExecutor: ActionExecuting {
+public final class ActionExecutor: ActionExecuting, @unchecked Sendable {
 
     private let fileManager: FileManager
     private let undoLog: UndoLogging
@@ -14,7 +14,7 @@ public final class ActionExecutor: ActionExecuting {
         var records: [UndoRecord] = []
 
         for item in items {
-            guard let destinationDir = resolveDestinationDirectory(for: item.action) else {
+            guard let (destinationDir, preferredFilename) = resolveDestination(for: item) else {
                 // .keep — nothing to do.
                 SweepLogger.executor.debug("Keeping \(item.file.filename) in place")
                 continue
@@ -30,7 +30,7 @@ public final class ActionExecutor: ActionExecuting {
 
             // Resolve final destination URL, handling filename collisions.
             let finalDestination = resolveCollision(
-                for: item.file.url.lastPathComponent,
+                for: preferredFilename,
                 in: destinationDir
             )
 
@@ -67,23 +67,26 @@ public final class ActionExecutor: ActionExecuting {
 
     // MARK: - Helpers
 
-    private func resolveDestinationDirectory(for action: ProposedAction) -> URL? {
-        switch action {
+    /// Returns `(destinationDirectory, preferredFilename)` for a planned item,
+    /// or `nil` for `.keep` (no file operation needed).
+    private func resolveDestination(for item: PlannedItem) -> (URL, String)? {
+        switch item.action {
         case .keep:
             return nil
 
         case .move(let destination, _):
-            // destination is the full target URL; return its directory.
-            return destination.deletingLastPathComponent()
+            // Claude specified the full target path; split into dir + filename.
+            return (destination.deletingLastPathComponent(), destination.lastPathComponent)
 
         case .archive:
             let monthFolder = currentYearMonthString()
-            let path = ("~/Documents/Sweep/Archive/" + monthFolder as NSString).expandingTildeInPath
-            return URL(fileURLWithPath: path)
+            let rawPath = "~/Documents/Sweep/Archive/" + monthFolder
+            let path = (rawPath as NSString).expandingTildeInPath
+            return (URL(fileURLWithPath: path), item.file.url.lastPathComponent)
 
         case .reviewLater:
             let path = ("~/Documents/Sweep/Review" as NSString).expandingTildeInPath
-            return URL(fileURLWithPath: path)
+            return (URL(fileURLWithPath: path), item.file.url.lastPathComponent)
         }
     }
 

@@ -1,6 +1,6 @@
 import Foundation
 
-public final class UndoLog: UndoLogging {
+public final class UndoLog: UndoLogging, @unchecked Sendable {
 
     public let fileURL: URL
 

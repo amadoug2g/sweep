@@ -3,7 +3,7 @@ import Foundation
 
 // MARK: - MockDownloadsScanner
 
-public final class MockDownloadsScanner: DownloadsScanning {
+public final class MockDownloadsScanner: DownloadsScanning, @unchecked Sendable {
 
     /// Set to make `scan()` return a specific report.
     public var stubbedReport: ScanReport?
@@ -26,7 +26,7 @@ public final class MockDownloadsScanner: DownloadsScanning {
 
 // MARK: - MockActionExecutor
 
-public final class MockActionExecutor: ActionExecuting {
+public final class MockActionExecutor: ActionExecuting, @unchecked Sendable {
 
     /// Records every `(items, batchId)` call received.
     public private(set) var executeCalls: [([PlannedItem], UUID)] = []
@@ -48,7 +48,7 @@ public final class MockActionExecutor: ActionExecuting {
 
 // MARK: - MockUndoLog
 
-public final class MockUndoLog: UndoLogging {
+public final class MockUndoLog: UndoLogging, @unchecked Sendable {
 
     private var store: [UndoRecord] = []
 
@@ -115,7 +115,7 @@ public final class MockUndoLog: UndoLogging {
 
 // MARK: - MockNotificationService
 
-public final class MockNotificationService: Notifying {
+public final class MockNotificationService: Notifying, @unchecked Sendable {
 
     public struct Call {
         public let executed: [UndoRecord]

@@ -222,7 +222,7 @@ public final class ClaudeClient: ClaudeClienting {
         static let apiKeyName = "anthropic_api_key"
         static let chunkSize = 50
         static let maxRetries = 3
-        static let baseBackoffSeconds: UInt64 = 2
+        static let baseBackoffNanoseconds: UInt64 = 2_000_000_000  // 2 seconds
     }
 
     // MARK: - Properties
@@ -230,16 +230,31 @@ public final class ClaudeClient: ClaudeClienting {
     private let keychainStore: KeychainStoring
     private let session: URLSessionProtocol
     private let systemPromptText: String
+    /// Injectable sleep function — nanoseconds argument. Defaults to Task.sleep.
+    /// Overridden in tests to avoid real delays.
+    private let sleepNanoseconds: @Sendable (UInt64) async throws -> Void
 
     // MARK: - Init
 
+    /// Production initialiser using `URLSession.shared` and real exponential backoff sleep.
     public convenience init(keychainStore: KeychainStoring, session: URLSession = .shared) {
-        self.init(keychainStore: keychainStore, urlSession: session)
+        self.init(keychainStore: keychainStore, urlSession: session, sleepNanoseconds: { ns in
+            try await Task.sleep(nanoseconds: ns)
+        })
     }
 
-    public init(keychainStore: KeychainStoring, urlSession: URLSessionProtocol) {
+    /// Designated initialiser — allows injection of a custom `URLSessionProtocol` and sleep
+    /// function (useful in tests).
+    public init(
+        keychainStore: KeychainStoring,
+        urlSession: URLSessionProtocol,
+        sleepNanoseconds: @escaping @Sendable (UInt64) async throws -> Void = { ns in
+            try await Task.sleep(nanoseconds: ns)
+        }
+    ) {
         self.keychainStore = keychainStore
         self.session = urlSession
+        self.sleepNanoseconds = sleepNanoseconds
         self.systemPromptText = Self.loadSystemPrompt()
     }
 
@@ -389,9 +404,9 @@ public final class ClaudeClient: ClaudeClienting {
                 }
 
                 if httpResponse.statusCode == 429 {
-                    let backoffSeconds = Constants.baseBackoffSeconds << attempt  // 2, 4, 8
-                    SweepLogger.claude.warning("ClaudeClient: rate limited (attempt \(attempt + 1)/\(Constants.maxRetries)), backing off \(backoffSeconds)s")
-                    try await Task.sleep(nanoseconds: backoffSeconds * 1_000_000_000)
+                    let backoffNs = Constants.baseBackoffNanoseconds << attempt  // 2s, 4s, 8s
+                    SweepLogger.claude.warning("ClaudeClient: rate limited (attempt \(attempt + 1)/\(Constants.maxRetries)), backing off \(backoffNs / 1_000_000_000)s")
+                    try await sleepNanoseconds(backoffNs)
                     lastError = ClaudeClientError.rateLimited
                     continue
                 }

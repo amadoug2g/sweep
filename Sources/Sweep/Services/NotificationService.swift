@@ -1,7 +1,7 @@
 import Foundation
 import UserNotifications
 
-public final class NotificationService: Notifying {
+public final class NotificationService: Notifying, @unchecked Sendable {
 
     private static let categoryIdentifier = "SWEEP_BATCH"
     private static let undoActionIdentifier = "UNDO_BATCH"
