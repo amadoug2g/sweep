@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-dmg:
+    name: Build & Package DMG
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select latest Xcode
+        run: sudo xcode-select -s $(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+
+      - name: Build release
+        run: make build
+
+      - name: Package DMG
+        run: make dmg || echo "DMG packaging not yet implemented — skipping"
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sweep-${{ github.ref_name }}
+          path: 'dist/*.dmg'
+          if-no-files-found: warn
+          retention-days: 30

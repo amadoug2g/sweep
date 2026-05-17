@@ -1,0 +1,33 @@
+# Swift / SPM
+.build/
+.swiftpm/
+*.resolved
+
+# Xcode (if used)
+*.xcodeproj/
+*.xcworkspace/
+DerivedData/
+xcuserdata/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Distribution artifacts
+dist/
+*.dmg
+*.pkg
+
+# Secrets — never commit these
+.env
+*.env.local
+Secrets.swift

@@ -1,0 +1,3 @@
+import Sweep
+
+SweepApp.main()
