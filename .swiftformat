@@ -1,0 +1,18 @@
+{
+  "indentation": 4,
+  "lineLength": 120,
+  "tabWidth": 4,
+  "useTabs": false,
+  "trailingCommas": "inline",
+  "wrapArguments": "before-first",
+  "wrapParameters": "before-first",
+  "wrapCollections": "before-first",
+  "closingBracketOnNextLine": false,
+  "uppercaseHex": false,
+  "decimals": "ignore",
+  "hexLiterals": "lowercase",
+  "operatorFunction": true,
+  "sortedImports": true,
+  "groupedImports": true,
+  "importGroupSpacing": "consistent"
+}
