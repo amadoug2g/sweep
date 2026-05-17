@@ -1,6 +1,5 @@
 import Foundation
 import Security
-import os.log
 
 public final class KeychainStore: KeychainStoring {
 
