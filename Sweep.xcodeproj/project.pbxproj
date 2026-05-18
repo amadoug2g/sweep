@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -37,6 +37,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		AA000002000000000000000A = {
+			isa = PBXGroup;
+			children = (
+				AA000004000000000000000A /* SweepApp */,
+				AA000001000000000000000B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
 		AA000004000000000000000A /* SweepApp */ = {
 			isa = PBXGroup;
 			children = (
@@ -44,14 +52,6 @@
 				AA000013000000000000000A /* Info.plist */,
 			);
 			path = SweepApp;
-			sourceTree = "<group>";
-		};
-		AA000002000000000000000A = {
-			isa = PBXGroup;
-			children = (
-				AA000004000000000000000A /* SweepApp */,
-				AA000001000000000000000B /* Products */,
-			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -248,7 +248,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Q6J6G98354;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SweepApp/Info.plist;
@@ -272,7 +272,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Q6J6G98354;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SweepApp/Info.plist;
@@ -316,7 +316,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		AA000020000000000000000A /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ".";
+			relativePath = .;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -327,7 +327,6 @@
 			productName = Sweep;
 		};
 /* End XCSwiftPackageProductDependency section */
-
 	};
 	rootObject = AA000001000000000000000A /* Project object */;
 }
