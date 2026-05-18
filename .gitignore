@@ -5,7 +5,9 @@
 
 # Xcode (if used)
 *.xcodeproj/
+!Sweep.xcodeproj/
 *.xcworkspace/
+!Sweep.xcodeproj/project.xcworkspace/
 DerivedData/
 xcuserdata/
 *.pbxuser
