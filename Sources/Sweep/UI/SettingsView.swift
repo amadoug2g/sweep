@@ -81,6 +81,12 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 400)
         .padding()
+        .onAppear {
+            // LSUIElement apps don't activate automatically when a window opens,
+            // so the Settings window can appear behind other apps. Force-activate
+            // to bring it to the front.
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 
     // MARK: - Helpers
