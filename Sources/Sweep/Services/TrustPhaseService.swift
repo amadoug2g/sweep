@@ -33,9 +33,7 @@ public final class TrustPhaseService: TrustPhasing {
             return true
         }
         let elapsed = Date().timeIntervalSince(installDate)
-        let result = elapsed < trustPeriodDays * 86_400
-        SweepLogger.trust.debug("TrustPhaseService.isInTrustPeriod: elapsed=\(elapsed) result=\(result)")
-        return result
+        return elapsed < trustPeriodDays * 86_400
     }
 
     public func recordSuccessfulAction() {
