@@ -159,12 +159,21 @@ struct MenuBarRoot: View {
 
     private var footerLinks: some View {
         HStack {
-            Button("Settings…") {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+            if #available(macOS 14, *) {
+                SettingsLink {
+                    Text("Settings…")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.borderless)
+            } else {
+                Button("Settings…") {
+                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                }
+                .font(.caption)
+                .buttonStyle(.borderless)
+                .foregroundStyle(.secondary)
             }
-            .font(.caption)
-            .buttonStyle(.borderless)
-            .foregroundStyle(.secondary)
 
             Spacer()
 
