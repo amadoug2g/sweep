@@ -15,7 +15,7 @@ public final class KeychainStore: KeychainStoring {
     @discardableResult
     public func save(key: String, value: String) -> Bool {
         guard let data = value.data(using: .utf8) else {
-            SweepLogger.storage.error("KeychainStore.save: failed to encode value for key '\(key, privacy: .public)'")
+            SweepLogger.storage.error("KeychainStore.save: failed to encode value for key '\(key)'")
             return false
         }
 
@@ -32,10 +32,10 @@ public final class KeychainStore: KeychainStoring {
             ]
             let updateStatus = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
             if updateStatus != errSecSuccess {
-                SweepLogger.storage.error("KeychainStore.save: SecItemUpdate failed for key '\(key, privacy: .public)' status=\(updateStatus)")
+                SweepLogger.storage.error("KeychainStore.save: SecItemUpdate failed for key '\(key)' status=\(updateStatus)")
                 return false
             }
-            SweepLogger.storage.debug("KeychainStore.save: updated key '\(key, privacy: .public)'")
+            SweepLogger.storage.debug("KeychainStore.save: updated key '\(key)'")
             return true
 
         case errSecItemNotFound:
@@ -45,14 +45,14 @@ public final class KeychainStore: KeychainStoring {
             addQuery[kSecAttrAccessible] = kSecAttrAccessibleWhenUnlocked
             let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
             if addStatus != errSecSuccess {
-                SweepLogger.storage.error("KeychainStore.save: SecItemAdd failed for key '\(key, privacy: .public)' status=\(addStatus)")
+                SweepLogger.storage.error("KeychainStore.save: SecItemAdd failed for key '\(key)' status=\(addStatus)")
                 return false
             }
-            SweepLogger.storage.debug("KeychainStore.save: added key '\(key, privacy: .public)'")
+            SweepLogger.storage.debug("KeychainStore.save: added key '\(key)'")
             return true
 
         default:
-            SweepLogger.storage.error("KeychainStore.save: SecItemCopyMatching failed for key '\(key, privacy: .public)' status=\(status)")
+            SweepLogger.storage.error("KeychainStore.save: SecItemCopyMatching failed for key '\(key)' status=\(status)")
             return false
         }
     }
@@ -67,17 +67,17 @@ public final class KeychainStore: KeychainStoring {
 
         guard status == errSecSuccess else {
             if status != errSecItemNotFound {
-                SweepLogger.storage.error("KeychainStore.load: SecItemCopyMatching failed for key '\(key, privacy: .public)' status=\(status)")
+                SweepLogger.storage.error("KeychainStore.load: SecItemCopyMatching failed for key '\(key)' status=\(status)")
             }
             return nil
         }
 
         guard let data = result as? Data, let string = String(data: data, encoding: .utf8) else {
-            SweepLogger.storage.error("KeychainStore.load: failed to decode data for key '\(key, privacy: .public)'")
+            SweepLogger.storage.error("KeychainStore.load: failed to decode data for key '\(key)'")
             return nil
         }
 
-        SweepLogger.storage.debug("KeychainStore.load: loaded key '\(key, privacy: .public)'")
+        SweepLogger.storage.debug("KeychainStore.load: loaded key '\(key)'")
         return string
     }
 
@@ -85,9 +85,9 @@ public final class KeychainStore: KeychainStoring {
         let query = baseQuery(for: key)
         let status = SecItemDelete(query as CFDictionary)
         if status != errSecSuccess && status != errSecItemNotFound {
-            SweepLogger.storage.error("KeychainStore.delete: SecItemDelete failed for key '\(key, privacy: .public)' status=\(status)")
+            SweepLogger.storage.error("KeychainStore.delete: SecItemDelete failed for key '\(key)' status=\(status)")
         } else {
-            SweepLogger.storage.debug("KeychainStore.delete: deleted key '\(key, privacy: .public)'")
+            SweepLogger.storage.debug("KeychainStore.delete: deleted key '\(key)'")
         }
     }
 

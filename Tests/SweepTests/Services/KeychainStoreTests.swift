@@ -16,7 +16,7 @@ final class KeychainStoreTests: XCTestCase {
 
     override func tearDown() {
         // Clean up any key that may have been written during the test.
-        store.delete(testKey)
+        store.delete(key:testKey)
         store = nil
         super.tearDown()
     }
@@ -39,14 +39,14 @@ final class KeychainStoreTests: XCTestCase {
 
     func testLoadReturnsNilAfterDelete() {
         store.save(key: testKey, value: "some-value")
-        store.delete(testKey)
+        store.delete(key:testKey)
         XCTAssertNil(store.load(key: testKey))
     }
 
     // MARK: - Delete is idempotent (deleting a non-existent key does not crash)
 
     func testDeleteNonExistentKeyDoesNotCrash() {
-        XCTAssertNoThrow(store.delete("never-saved"))
+        XCTAssertNoThrow(store.delete(key:"never-saved"))
     }
 
     // MARK: - Update overwrites the previous value
@@ -68,8 +68,8 @@ final class KeychainStoreTests: XCTestCase {
         let keyA = "keyA"
         let keyB = "keyB"
         defer {
-            store.delete(keyA)
-            store.delete(keyB)
+            store.delete(key:keyA)
+            store.delete(key:keyB)
         }
 
         store.save(key: keyA, value: "alpha")

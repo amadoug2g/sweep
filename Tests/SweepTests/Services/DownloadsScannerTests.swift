@@ -11,6 +11,9 @@ final class DownloadsScannerTests: XCTestCase {
         tempDir = FileManager.default.temporaryDirectory
             .appendingPathComponent("SweepScannerTests-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        // Resolve symlinks AFTER creation (full path must exist) so /var → /private/var
+        // is normalised and URL comparisons against scanner results always match.
+        tempDir = tempDir.resolvingSymlinksInPath()
     }
 
     override func tearDown() async throws {
@@ -98,7 +101,8 @@ final class DownloadsScannerTests: XCTestCase {
         let report = try await makeScanner().scan()
         XCTAssertEqual(report.items.count, 1)
         XCTAssertEqual(report.items.first?.filename, "report.pdf")
-        XCTAssertEqual(report.items.first?.url, url)
+        // Resolve symlinks on both sides — macOS scanner resolves /var→/private/var
+        XCTAssertEqual(report.items.first?.url.resolvingSymlinksInPath(), url.resolvingSymlinksInPath())
         XCTAssertEqual(report.skippedCount, 0)
     }
 

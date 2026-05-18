@@ -60,13 +60,27 @@ final class NotificationServiceTests: XCTestCase {
 
 #if canImport(UserNotifications)
     // MARK: - NotificationService (real, macOS only)
+    // Note: UNUserNotificationCenter.current() requires an app bundle proxy and
+    // will crash when called from the xctest runner (no bundle identifier).
+    // These tests guard with XCTSkip so they run only inside a real app target.
 
-    func testNotifyBatchCompleteWithEmptyArrayDoesNotCrash() async {
+    private func skipIfNoBundleContext() throws {
+        // UNUserNotificationCenter.current() crashes with NSInternalInconsistencyException
+        // in the xctest runner because there is no app bundle proxy. The runner process
+        // is always named "xctest", so use that as the reliable signal.
+        if ProcessInfo.processInfo.processName == "xctest" {
+            throw XCTSkip("UNUserNotificationCenter requires an app bundle proxy — skipped in xctest runner")
+        }
+    }
+
+    func testNotifyBatchCompleteWithEmptyArrayDoesNotCrash() async throws {
+        try skipIfNoBundleContext()
         let service = NotificationService()
         await service.notifyBatchComplete(executed: [], pendingReviewCount: 0)
     }
 
-    func testNotifyBatchCompleteWithOneItemDoesNotCrash() async {
+    func testNotifyBatchCompleteWithOneItemDoesNotCrash() async throws {
+        try skipIfNoBundleContext()
         let service = NotificationService()
         let record = UndoRecord(
             batchId: UUID(),
@@ -77,7 +91,8 @@ final class NotificationServiceTests: XCTestCase {
         await service.notifyBatchComplete(executed: [record], pendingReviewCount: 0)
     }
 
-    func testNotifyBatchCompleteWithMultipleItemsDoesNotCrash() async {
+    func testNotifyBatchCompleteWithMultipleItemsDoesNotCrash() async throws {
+        try skipIfNoBundleContext()
         let service = NotificationService()
         let records = (0..<3).map { i in
             UndoRecord(
@@ -90,7 +105,8 @@ final class NotificationServiceTests: XCTestCase {
         await service.notifyBatchComplete(executed: records, pendingReviewCount: 2)
     }
 
-    func testNotifyBatchCompleteWithPendingReviewDoesNotCrash() async {
+    func testNotifyBatchCompleteWithPendingReviewDoesNotCrash() async throws {
+        try skipIfNoBundleContext()
         let service = NotificationService()
         await service.notifyBatchComplete(executed: [], pendingReviewCount: 5)
     }
